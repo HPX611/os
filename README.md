@@ -17,8 +17,8 @@
 加载mbr
 
 ```cmd
-nasm -I include/ -o mbr.bin mbr.S
-dd if=./mbr.bin of=/home/cdh/os/bochs/hd60M.img bs=512 count=1 conv=notrunc
+nasm -I include/ -o ../build/mbr mbr.S
+dd if=../build/mbr of=/home/cdh/os/bochs/hd60M.img bs=512 count=1 conv=notrunc
 ```
 
 
@@ -26,9 +26,14 @@ dd if=./mbr.bin of=/home/cdh/os/bochs/hd60M.img bs=512 count=1 conv=notrunc
 加载loader
 
 ```cmd
-nasm -I include/ -o loader.bin loader.S
-dd if=./loader.bin of=/home/cdh/os/bochs/hd60M.img bs=512 count=4 seek=2 conv=notrunc
+nasm -I include/ -o ../build/loader loader.S
+dd if=../build/loader of=/home/cdh/os/bochs/hd60M.img bs=512 count=4 seek=2 conv=notrunc
 ```
 
 
 
+启用分页机制
+
+1. 准备好页目录表及页表
+2. 将页表地址写入控制寄存器 cr3
+3. 寄存器 cr0 的 PG 位置 1
