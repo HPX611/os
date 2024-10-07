@@ -23,8 +23,8 @@ SECTION MBR vstart=0x7c00
 ;BH = 上卷行属性 
 ;(CL,CH) = 窗口左上角的(X,Y)位置 
 ;(DL,DH) = 窗口右下角的(X,Y)位置 
-;无返回值：      mov ax, 0600h 
-
+;无返回值：      
+    mov ax, 0600h 
     mov bx, 0700h 
     mov cx, 0 ; 左上角: (0, 0) 
     mov dx, 184fh ; 右下角: (80,25), 
@@ -54,7 +54,7 @@ SECTION MBR vstart=0x7c00
     mov cx,4 ; 待读入的扇区数 
     call rd_disk_m_16 ; 以下读取程序的起始部分(一个扇区) 
 
-    jmp LOADER_BASE_ADDR 
+    jmp LOADER_BASE_ADDR + 0x300    ;直接跳转到loader_start
 
 ;------------------------------------------------------------------------------- 
 ;功能:读取硬盘 n 个扇区 

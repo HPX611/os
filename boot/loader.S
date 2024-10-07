@@ -1,7 +1,7 @@
 %include "boot.inc" 
 section loader vstart=LOADER_BASE_ADDR 
 LOADER_STACK_TOP equ LOADER_BASE_ADDR 
-    jmp loader_start 
+    ;jmp loader_start 
 
 ;构建 gdt 及其内部的描述符 
     GDT_BASE: dd 0x00000000 
@@ -24,39 +24,48 @@ LOADER_STACK_TOP equ LOADER_BASE_ADDR
     SELECTOR_DATA equ (0x0002<<3) + TI_GDT + RPL0 ; 同上 
     SELECTOR_VIDEO equ (0x0003<<3) + TI_GDT + RPL0 ; 同上 
 
+
+    total_mem_bytes dd 0		;(60+4)*8 = 512 = 0x200，加载代码的地址是0x900，地址是0xb00		                    ; 用于保存内存容量（以字节为单位），偏移 0x200 字节
+
 ;以下是 gdt 的指针，前 2 字节是 gdt 界限，后 4 字节是 gdt 起始地址 
 
     gdt_ptr dw GDT_LIMIT 
             dd GDT_BASE 
-    loadermsg db '2 loader in real.' 
+
+    ards_buf times 244 db 0                       ; 预留 244 字节的 ARDS 缓冲区
+    ards_nr dw 0            ; 用于记录 ARDS 结构体数量
+
 
 loader_start: 
 
-;------------------------------------------------------------ 
-;INT 0x10 功能号:0x13 功能描述:打印字符串 
-;------------------------------------------------------------ 
-;输入: 
-;AH 子功能号=13H 
-;BH = 页码 
-;BL = 属性(若 AL=00H 或 01H) 
-;CX=字符串长度 
-;(DH､ DL)=坐标(行､ 列) 
-;ES:BP=字符串地址 
-;AL=显示输出方式 
-; 0—字符串中只含显示字符，其显示属性在 BL 中 
-;显示后，光标位置不变 
-; 1—字符串中只含显示字符，其显示属性在 BL 中 
-;显示后，光标位置改变 
-; 2—字符串中含显示字符和显示属性。显示后，光标位置不变 
-; 3—字符串中含显示字符和显示属性。显示后，光标位置改变 
-;无返回值 
-    mov sp, LOADER_BASE_ADDR 
-    mov bp, loadermsg ; ES:BP = 字符串地址 
-    mov cx, 17 ; CX = 字符串长度 
-    mov ax, 0x1301 ; AH = 13, AL = 01h 
-    mov bx, 0x001f ; 页号为 0(BH = 0) 蓝底粉红字(BL = 1fh) 
-    mov dx, 0x1800 
-    int 0x10 ; 10h 号中断 
+    xor ebx, ebx		                                    ; 第一次调用时，ebx 值为 0
+    mov edx, 0x534d4150	                                    ; edx 赋值为 'SMAP' 标志
+    mov di, ards_buf	                                    ; di 指向 ARDS 缓冲区
+    .e820_mem_get_loop:	                                    ; 循环获取每个 ARDS 内存范围描述结构
+    mov eax, 0x0000e820	                                    ; 设置 E820 功能号
+    mov ecx, 20		                                        ; ARDS 结构大小是 20 字节
+    int 0x15                                                ; 调用 BIOS 中断 0x15 获取内存信息
+    add di, cx		                                        ; di 增加 20 字节，指向下一个 ARDS 结构位置
+    inc word [ards_nr]	                                    ; 增加 ARDS 数量
+    cmp ebx, 0		                                        ; 如果 ebx 为 0 且 cf 不为 1，则说明所有 ARDS 都已返回
+    jnz .e820_mem_get_loop                                  ; 如果 ebx 不为 0，则继续循环
+
+                                                            ; 在所有 ARDS 结构中，找出 (base_add_low + length_low) 的最大值，即内存容量
+    mov cx, [ards_nr]	                                    ; 将 ARDS 数量存入 cx
+    mov ebx, ards_buf                                       ; ebx 指向 ARDS 缓冲区
+    xor edx, edx		                                    ; edx 清零，用于保存最大内存容量
+    .find_max_mem_area:	                                    ; 遍历每一个 ARDS 结构体
+    mov eax, [ebx]	                                        ; 取出 base_add_low
+    add eax, [ebx+8]	                                    ; 加上 length_low，得到该段内存的结束地址
+    add ebx, 20		                                        ; 指向下一个 ARDS 结构
+    cmp edx, eax		                                    ; 比较 edx 和 eax，找出最大值(冒泡排序)
+    jge .next_ards                                          ; 如果 edx >= eax，则跳到 next_ards
+    mov edx, eax		                                    ; 如果 eax > edx，则将 edx 赋值为 eax
+    .next_ards:
+    loop .find_max_mem_area                                 ; 循环查找最大内存块
+
+    mov [total_mem_bytes], edx	                            ; 将最大内存容量存入 total_mem_bytes
+
 
 ;-------------------- 准备进入保护模式 ------------------------------- 
 ;1 打开 A20 
