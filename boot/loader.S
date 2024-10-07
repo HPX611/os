@@ -5,16 +5,16 @@ LOADER_STACK_TOP equ LOADER_BASE_ADDR
 
 ;构建 gdt 及其内部的描述符 
     GDT_BASE: dd 0x00000000 
-    dd 0x00000000 
+                dd 0x00000000 
 
     CODE_DESC: dd 0x0000FFFF 
-    dd DESC_CODE_HIGH4 
+                dd DESC_CODE_HIGH4 
 
     DATA_STACK_DESC: dd 0x0000FFFF 
-    dd DESC_DATA_HIGH4 
+                dd DESC_DATA_HIGH4 
 
     VIDEO_DESC: dd 0x80000007;limit=(0xbffff-0xb8000)/4k=0x7 
-    dd DESC_VIDEO_HIGH4 ;此时 dpl 为 0 
+                dd DESC_VIDEO_HIGH4 ;此时 dpl 为 0 
 
     GDT_SIZE equ $ - GDT_BASE 
     GDT_LIMIT equ GDT_SIZE - 1 
@@ -27,7 +27,7 @@ LOADER_STACK_TOP equ LOADER_BASE_ADDR
 ;以下是 gdt 的指针，前 2 字节是 gdt 界限，后 4 字节是 gdt 起始地址 
 
     gdt_ptr dw GDT_LIMIT 
-    dd GDT_BASE 
+            dd GDT_BASE 
     loadermsg db '2 loader in real.' 
 
 loader_start: 
@@ -81,23 +81,17 @@ loader_start:
     jmp dword SELECTOR_CODE:p_mode_start ; 刷新流水线 
 
 
-    [bits 32] 
+[bits 32] 
 p_mode_start: 
     mov ax, SELECTOR_DATA 
     mov ds, ax 
     mov es, ax 
     mov ss, ax 
     mov esp,LOADER_STACK_TOP 
-    mov ax, SELECTOR_VIDEO 
+    mov ax, SELECTOR_VIDEO
     mov gs, ax 
 
     mov byte [gs:160], 'P'
-    mov byte [gs:162], 'P'
-    mov byte [gs:164], 'P'
-    mov byte [gs:166], 'P'
-    mov byte [gs:168], 'P'
-    mov byte [gs:170], 'P'
-    mov byte [gs:172], 'P' 
     
 
     jmp $ 
