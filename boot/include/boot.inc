@@ -3,6 +3,12 @@ LOADER_BASE_ADDR equ 0x900  ;相当于c语言的#define LOADER_BASE_ADDR 0x900
                             ;定义了 loader 在内存中的位置,MBR 要把 loader 从硬盘读入后放到此处
                             ;即将来 loader 会在内存地址 0x900 处
 LOADER_START_SECTOR equ 0x2 ;loader 程序在硬盘上的起始扇区
+LOADER_STACK_TOP equ LOADER_BASE_ADDR               ;这一条之前是在loader.S中定义，现在搬过来了
+
+KERNEL_START_SECTOR equ 0x9 ;KERNEL所在扇区
+KERNEL_BIN_BASE_ADDR equ 0x70000    ;kernel.bin 文件读取到的位置
+
+KERNEL_ENTRY_POINT  equ 0xc0001500  ;kernel 启动的位置
 
 PAGE_DIR_TABLE_POS  equ 0x10_0000 ;PAGE_DIR_TABLE_POS 页目录的地址
 
@@ -42,9 +48,12 @@ RPL3  equ   11b                                     ;定义选择子的RPL为3
 TI_GDT	 equ   000b                                 ;定义段选择子请求的段描述符是在GDT中
 TI_LDT	 equ   100b                                 ;定义段选择子请求的段描述符是在LDT中
 
-;---------------- 页表相关属性 -------------- 
+                                                    ;---------------- 页表相关属性 -------------- 
 PG_P equ 1b 
 PG_RW_R equ 00b 
 PG_RW_W equ 10b 
 PG_US_S equ 000b 
 PG_US_U equ 100b
+
+                                                    ;---------------- 程序的type定义 -------------- 
+PT_NULL equ 0
