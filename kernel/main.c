@@ -1,20 +1,10 @@
 
 #include "print.h"
+#include "init.h"
 
-
-int main(void)
-{
+void main(void) { 
     put_str("I am kernel\n"); 
-    put_int(0); 
-    put_char('\n'); 
-    put_int(9); 
-    put_char('\n'); 
-    put_int(0x00021a3f); 
-    put_char('\n'); 
-    put_int(0x12345678); 
-    put_char('\n'); 
-    put_int(0x00000000); 
-    
-    while(1);
-    return 0;
-}
+    init_all(); 
+    asm volatile("sti"); //为演示中断处理,在此临时开中断 
+    while(1); 
+} 
