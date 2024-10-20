@@ -2,6 +2,7 @@
 #include "stdint.h" 
 #include "global.h" 
 #include "io.h"
+#include "print.h"
 
 #define PIC_M_CTRL 0x20 // 主片的控制端口是 0x20 
 #define PIC_M_DATA 0x21 // 主片的数据端口是 0x21 

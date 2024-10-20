@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 typedef void* intr_handler;
-void idt_init() ;
+void idt_init(void) ;
 
 /* 定义中断的两种状态: 
 * INTR_OFF 值为 0，表示关中断 

@@ -1,9 +1,16 @@
-#一些编译工具参数
+#文件夹
 BUILD_DIR=./build
+#kernel进入的地址
 ENTRY_POINT = 0xc0001500
+#硬盘的绝对地址
+HD60M_PATH=/home/cdh/os/bochs/hd60M.img	
+
+#编译的工具
 AS = nasm
 CC = gcc
 LD = ld
+
+#lib库的相对地址
 LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/
 
 #定义flags参数
@@ -15,6 +22,17 @@ LDFLAGS = -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map -m elf_i386
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
 	$(BUILD_DIR)/debug.o
+
+
+# 编译mbr和loader并写入磁盘
+boot : $(BUILD_DIR)/mbr $(BUILD_DIR)/loader
+
+$(BUILD_DIR)/mbr: boot/mbr.S
+	@$(AS) -I boot/include/ -o $@ $<
+
+$(BUILD_DIR)/loader: boot/loader.S
+	@$(AS) -I boot/include/ -o $@ $<
+
 
 ############## c 代码编译 ############### 
 $(BUILD_DIR)/main.o : kernel/main.c
@@ -34,28 +52,35 @@ $(BUILD_DIR)/debug.o : kernel/debug.c
 
 ############## 汇编代码编译 ############### 
 $(BUILD_DIR)/kernel.o : kernel/kernel.S 
-	$(AS) $(ASFLAGS) $< -o $@ 
+	@$(AS) $(ASFLAGS) $< -o $@ 
 
 $(BUILD_DIR)/print.o : lib/kernel/print.S 
-	$(AS) $(ASFLAGS) $< -o $@ 
+	@$(AS) $(ASFLAGS) $< -o $@ 
 
 ############## 链接所有目标文件 ############# 
 $(BUILD_DIR)/kernel.bin : $(OBJS) 
 	$(LD) $(LDFLAGS) $^ -o $@ 
 
-.PHONY : mk_dir hd clean all 
+.PHONY : mk_dir hd clean all boot
 
+#创建文件夹
 mk_dir: 
-	if [ ! -d $(BUILD_DIR) ];then mkdir $(BUILD_DIR);fi 
+	@if [ ! -d $(BUILD_DIR) ];then mkdir $(BUILD_DIR);fi 
 
+#将文件写到磁盘里，> /dev/null 2>&1 将dd命令的默认输出定向到空洞文件，不在中断显示
 hd: 
-	dd if=$(BUILD_DIR)/kernel.bin \
-	of=/home/cdh/os/bochs/hd60M.img \
-	bs=512 count=200 seek=9 conv=notrunc 
+	@dd if=$(BUILD_DIR)/mbr of=$(HD60M_PATH) bs=512 count=1 conv=notrunc > /dev/null 2>&1 
+	@dd if=$(BUILD_DIR)/loader of=$(HD60M_PATH) bs=512 count=4 seek=2 conv=notrunc  > /dev/null 2>&1
+	@dd if=$(BUILD_DIR)/kernel.bin of=$(HD60M_PATH) bs=512 count=200 seek=9 conv=notrunc  > /dev/null 2>&1
 
+#清理文件
 clean: 
 	@cd $(BUILD_DIR) && rm -f ./* && echo "remove all file"
 
+
+#编译kernel文件
 build: $(BUILD_DIR)/kernel.bin 
 
-all: mk_dir build hd 
+
+#先创建build文件夹，下来编译mbr loader 下来编译kernel 最后加载到硬盘
+all: mk_dir boot build hd 
