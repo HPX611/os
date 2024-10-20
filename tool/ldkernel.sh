@@ -17,12 +17,15 @@ nasm -f elf -o build/print.o lib/kernel/print.S -I lib/
 nasm -f elf -o build/kernel.o kernel/kernel.S 
 
 # 编译interrupt文件
-gcc-4.4 -c -o build/interrupt.o kernel/interrupt.c -m32 -I lib/kernel/ -I lib/ -I kernel/
+gcc-4.4 -c -o build/interrupt.o kernel/interrupt.c -m32 -I lib/kernel/ -I lib/ -I kernel/ -fno-builtin
+
+# 编译timer文件
+gcc-4.4 -c -o build/timer.o device/timer.c -m32 -I lib/kernel/ -I lib/ -I kernel/ -fno-builtin
 
 # 编译init文件
-gcc-4.4 -c -o build/init.o kernel/init.c -m32 -I lib/kernel/ -I lib/ -I kernel/
+gcc-4.4 -c -o build/init.o kernel/init.c -m32 -I lib/kernel/ -I lib/ -I kernel/ -I device/ -fno-builtin
 
 # 编译kernel文件并写入磁盘
-gcc-4.4 -c -o build/main.o kernel/main.c -m32 -I lib/kernel/ -I lib/ -I kernel/
-ld build/main.o build/init.o build/interrupt.o build/print.o build/kernel.o -Ttext 0xc0001500 -e main -o build/kernel.bin -m elf_i386
+gcc-4.4 -c -o build/main.o kernel/main.c -m32 -I lib/kernel/ -I lib/ -I kernel/ -fno-builtin
+ld build/main.o build/init.o build/interrupt.o build/print.o build/kernel.o build/timer.o -Ttext 0xc0001500 -e main -o build/kernel.bin -m elf_i386
 dd if=build/kernel.bin of=/home/cdh/os/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrunc
