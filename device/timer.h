@@ -2,6 +2,6 @@
 #define __DEVICE_TIMER_H
 
 #include "stdint.h"
-void timer_init();
+void timer_init(void);
 
 #endif 
