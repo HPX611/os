@@ -21,7 +21,8 @@ LDFLAGS = -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map -m elf_i386
 #目标文件连接的文件
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
-	$(BUILD_DIR)/debug.o
+	$(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
+	$(BUILD_DIR)/memory.o 
 
 
 # 编译mbr和loader并写入磁盘
@@ -48,6 +49,15 @@ $(BUILD_DIR)/timer.o : device/timer.c
 	$(CC) $(CFLAGS) $< -o $@ 
 
 $(BUILD_DIR)/debug.o : kernel/debug.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/string.o : lib/string.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/bitmap.o : lib/kernel/bitmap.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/memory.o : kernel/memory.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
 ############## 汇编代码编译 ############### 
