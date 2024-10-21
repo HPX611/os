@@ -11,7 +11,8 @@
 			"debug.h": "c",
 			"global.h": "c",
 			"interrupt.h": "c",
-			"bitmap.h": "c"
+			"bitmap.h": "c",
+			"memory.h": "c"
 		}
 	}
 }
