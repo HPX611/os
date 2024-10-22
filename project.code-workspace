@@ -12,7 +12,9 @@
 			"global.h": "c",
 			"interrupt.h": "c",
 			"bitmap.h": "c",
-			"memory.h": "c"
+			"memory.h": "c",
+			"thread.h": "c",
+			"thread": "c"
 		}
 	}
 }

@@ -11,7 +11,7 @@ CC = gcc
 LD = ld
 
 #lib库的相对地址
-LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/
+LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/ -I thread/
 
 #定义flags参数
 ASFLAGS = -f elf
@@ -22,7 +22,7 @@ LDFLAGS = -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map -m elf_i386
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
 	$(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
-	$(BUILD_DIR)/memory.o 
+	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o 
 
 
 # 编译mbr和loader并写入磁盘
@@ -58,6 +58,9 @@ $(BUILD_DIR)/bitmap.o : lib/kernel/bitmap.c
 	$(CC) $(CFLAGS) $< -o $@ 
 
 $(BUILD_DIR)/memory.o : kernel/memory.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/thread.o : thread/thread.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
 ############## 汇编代码编译 ############### 

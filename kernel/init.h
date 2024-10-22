@@ -5,6 +5,7 @@
 #include "interrupt.h" 
 #include "timer.h"
 #include "memory.h"
+#include "thread.h"
 
 void init_all(void);
 
