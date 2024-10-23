@@ -6,6 +6,8 @@
 #include "timer.h"
 #include "memory.h"
 #include "thread.h"
+#include "debug.h"
+#include "list.h"
 
 void init_all(void);
 

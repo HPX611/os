@@ -3,6 +3,7 @@
 #include "string.h" 
 #include "global.h" 
 #include "memory.h" 
+#include "init.h" 
 
 #define PG_SIZE 4096 
 
@@ -14,7 +15,7 @@ static struct list_elem* thread_tag;// 用于保存队列中的线程结点
 extern void switch_to(struct task_struct* cur, struct task_struct* next); 
 
 /* 获取当前线程 pcb 指针 */ 
-struct task_struct* running_thread() { 
+struct task_struct* running_thread(void) { 
     uint32_t esp; 
     asm ("mov %%esp, %0" : "=g" (esp)); 
     /* 取 esp 整数部分，即 pcb 起始地址 */ 
@@ -24,7 +25,8 @@ struct task_struct* running_thread() {
 
 /* 由 kernel_thread 去执行 function(func_arg) */ 
 static void kernel_thread(thread_func* function, void* func_arg) { 
-/* 执行 function 前要开中断，避免后面的时钟中断被屏蔽，而无法调度其他线程 */ 
+    /* 执行 function 前要开中断，避免后面的时钟中断被屏蔽，而无法调度其他线程 */
+    //就比如第一次调用的话就是switch_to调用的刚切上来，此时是在中断里的（会自动关闭中断）要打开中断服务
     intr_enable(); 
     function(func_arg); 
 } 
@@ -102,3 +104,41 @@ static void make_main_thread(void) {
     ASSERT(!elem_find(&thread_all_list, &main_thread->all_list_tag)); 
     list_append(&thread_all_list, &main_thread->all_list_tag); 
 } 
+
+/* 实现任务调度 */ 
+void schedule(void) { 
+    
+    ASSERT(intr_get_status() == INTR_OFF); 
+    
+    struct task_struct* cur = running_thread(); 
+    if (cur->status == TASK_RUNNING) { 
+         // 若此线程只是 cpu 时间片到了，将其加入到就绪队列尾 
+        ASSERT(!elem_find(&thread_ready_list, &cur->general_tag)); 
+        list_append(&thread_ready_list, &cur->general_tag); 
+        cur->ticks = cur->priority; 
+         // 重新将当前线程的 ticks 再重置为其 priority 
+        cur->status = TASK_READY; 
+    } else { 
+    /* 若此线程需要某事件发生后才能继续上 cpu 运行， 
+    不需要将其加入队列，因为当前线程不在就绪队列中 */ 
+    } 
+    
+    ASSERT(!list_empty(&thread_ready_list)); 
+    thread_tag = NULL; // thread_tag 清空 
+    /* 将 thread_ready_list 队列中的第一个就绪线程弹出， 
+     准备将其调度上 cpu */ 
+    thread_tag = list_pop(&thread_ready_list); 
+    struct task_struct* next = elem2entry(struct task_struct, general_tag, thread_tag); 
+    next->status = TASK_RUNNING; 
+    switch_to(cur, next); 
+} 
+
+/* 初始化线程环境 */ 
+void thread_init(void) { 
+    put_str("thread_init start\n"); 
+    list_init(&thread_ready_list); 
+    list_init(&thread_all_list); 
+    /* 将当前 main 函数创建为线程 */ 
+    make_main_thread(); 
+    put_str("thread_init done\n"); 
+}

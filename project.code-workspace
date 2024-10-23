@@ -14,7 +14,8 @@
 			"bitmap.h": "c",
 			"memory.h": "c",
 			"thread.h": "c",
-			"thread": "c"
+			"thread": "c",
+			"print.h": "c"
 		}
 	}
 }

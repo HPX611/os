@@ -2,7 +2,9 @@
 #define __LIB_KERNEL_LIST_H 
 #include "global.h" 
 
-#define offset(struct_type,member) (int)(&((struct_type*)0)->member) 
+//取出结构体中变量的偏移量
+#define offset(struct_type,member) (int)(&((struct_type*)0)->member)
+//elem_ptr的地址转化为struct_type结构体的地址，elem_ptr是结构体中的成员
 #define elem2entry(struct_type, struct_member_name, elem_ptr) (struct_type*)((int)elem_ptr - offset(struct_type, struct_member_name)) 
 
 /********** 定义链表结点成员结构 *********** 
