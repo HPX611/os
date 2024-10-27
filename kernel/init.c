@@ -9,4 +9,5 @@ void init_all() {
     thread_init(); // 初始化线程相关结构 
     timer_init(); // 初始化 PIT 
     console_init(); //控制台初始化最好放在开中断之前 
+    keyboard_init(); // 键盘初始化
 } 

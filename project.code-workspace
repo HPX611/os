@@ -27,7 +27,8 @@
 			"optional": "c",
 			"istream": "c",
 			"ostream": "c",
-			"sstream": "c"
+			"sstream": "c",
+			"console.h": "c"
 		}
 	}
 }

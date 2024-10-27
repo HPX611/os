@@ -10,7 +10,7 @@
 #include "list.h"
 #include "console.h"
 #include "sync.h"
-
+#include "keyboard.h"
 
 void init_all(void);
 
