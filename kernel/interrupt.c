@@ -3,6 +3,7 @@
 #include "global.h" 
 #include "io.h"
 #include "print.h"
+#include "init.h"
 
 #define PIC_M_CTRL 0x20 // 主片的控制端口是 0x20 
 #define PIC_M_DATA 0x21 // 主片的数据端口是 0x21 
@@ -83,7 +84,7 @@ static void general_intr_handler(uint8_t vec_nr) {
          // 0x2f 是从片 8259A 上的最后一个 irq 引脚，保留 
          //IRQ7 和 IRQ15 会产生伪中断(spurious interrupt)无需处理 
         return; 
-    } 
+    }
     /* 将光标置为 0，从屏幕左上角清出一片打印异常信息的区域，方便阅读 */ 
     set_cursor(0); 
     int cursor_pos = 0; 

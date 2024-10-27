@@ -8,6 +8,9 @@
 #include "thread.h"
 #include "debug.h"
 #include "list.h"
+#include "console.h"
+#include "sync.h"
+
 
 void init_all(void);
 

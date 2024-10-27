@@ -15,7 +15,19 @@
 			"memory.h": "c",
 			"thread.h": "c",
 			"thread": "c",
-			"print.h": "c"
+			"print.h": "c",
+			"list.h": "c",
+			"ratio": "c",
+			"system_error": "c",
+			"tuple": "c",
+			"array": "c",
+			"functional": "c",
+			"type_traits": "c",
+			"utility": "c",
+			"optional": "c",
+			"istream": "c",
+			"ostream": "c",
+			"sstream": "c"
 		}
 	}
 }

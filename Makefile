@@ -23,7 +23,7 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
 	$(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o \
-	$(BUILD_DIR)/switch.o
+	$(BUILD_DIR)/switch.o $(BUILD_DIR)/console.o $(BUILD_DIR)/sync.o
 
 
 # 编译mbr和loader并写入磁盘
@@ -49,6 +49,9 @@ $(BUILD_DIR)/interrupt.o : kernel/interrupt.c
 $(BUILD_DIR)/timer.o : device/timer.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
+$(BUILD_DIR)/console.o : device/console.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
 $(BUILD_DIR)/debug.o : kernel/debug.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
@@ -65,6 +68,9 @@ $(BUILD_DIR)/memory.o : kernel/memory.c
 	$(CC) $(CFLAGS) $< -o $@ 
 
 $(BUILD_DIR)/thread.o : thread/thread.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/sync.o : thread/sync.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
 ############## 汇编代码编译 ############### 
@@ -90,9 +96,9 @@ mk_dir:
 
 #将文件写到磁盘里，> /dev/null 2>&1 将dd命令的默认输出定向到空洞文件，不在中断显示
 hd: 
-	@dd if=$(BUILD_DIR)/mbr of=$(HD60M_PATH) bs=512 count=1 conv=notrunc > /dev/null 2>&1 
-	@dd if=$(BUILD_DIR)/loader of=$(HD60M_PATH) bs=512 count=4 seek=2 conv=notrunc  > /dev/null 2>&1
-	@dd if=$(BUILD_DIR)/kernel.bin of=$(HD60M_PATH) bs=512 count=200 seek=9 conv=notrunc  > /dev/null 2>&1
+	@dd if=$(BUILD_DIR)/mbr of=$(HD60M_PATH) bs=512 count=1 conv=notrunc 
+	@dd if=$(BUILD_DIR)/loader of=$(HD60M_PATH) bs=512 count=4 seek=2 conv=notrunc 
+	@dd if=$(BUILD_DIR)/kernel.bin of=$(HD60M_PATH) bs=512 count=200 seek=9 conv=notrunc 
 
 #清理文件
 clean: 

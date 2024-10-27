@@ -1,7 +1,11 @@
-#include "timer.h" 
-#include "io.h" 
-#include "print.h" 
-#include "init.h"
+#include "timer.h"
+#include "io.h"
+#include "print.h"
+
+#include "interrupt.h"
+#include "thread.h"
+#include "debug.h"
+
 
 #define IRQ0_FREQUENCY 100 
 #define INPUT_FREQUENCY 1193180 
@@ -11,8 +15,8 @@
 #define COUNTER_MODE 2 
 #define READ_WRITE_LATCH 3 
 #define PIT_CONTROL_PORT 0x43 
- 
-uint32_t ticks; // ticks 是内核自中断开启以来总共的嘀嗒数
+
+uint32_t ticks;  // ticks是内核自中断开启以来总共的嘀嗒数
 
  /* 把操作的计数器 counter_no､ 读写锁属性 rwl､ 计数器模式 counter_mode 写入模式控制寄存器并赋予初始值 counter_value */ 
 static void frequency_set(uint8_t counter_port, uint8_t counter_no, uint8_t rwl, uint8_t counter_mode, uint16_t counter_value) { 
@@ -21,9 +25,12 @@ static void frequency_set(uint8_t counter_port, uint8_t counter_no, uint8_t rwl,
     /* 先写入 counter_value 的低 8 位 */ 
     outb(counter_port, (uint8_t)counter_value); 
     /* 再写入 counter_value 的高 8 位 */ 
-    outb(counter_port, (uint8_t)counter_value >> 8); 
+    // outb(counter_port, (uint8_t)counter_value >> 8);
+    // 作者这句代码会先将16位的counter_value强制类型转换为8位值，也就是原来16位值只留下了低8位，然后
+    // 又右移8未，所以最后送入counter_port的counter_value的高8位是8个0，这会导致时钟频率过高，出现GP异常
+    // 先右移，再强转
+    outb(counter_port, (uint8_t)(counter_value >> 8)); 
 } 
-
 
 
 /* 时钟的中断处理函数 */ 
