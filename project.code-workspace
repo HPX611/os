@@ -28,7 +28,11 @@
 			"istream": "c",
 			"ostream": "c",
 			"sstream": "c",
-			"console.h": "c"
+			"console.h": "c",
+			"ioqueue.h": "c",
+			"keyboard.h": "c",
+			"stdint.h": "c",
+			"sync.h": "c"
 		}
 	}
 }

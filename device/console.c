@@ -3,6 +3,8 @@
 #include "stdint.h"
 #include "sync.h"
 #include "thread.h"
+#include "ioqueue.h"
+
 static struct lock console_lock;    // 控制台锁
 
 /* 初始化终端 */

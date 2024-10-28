@@ -196,7 +196,7 @@ static void intr_keyboard_handler(void) {
         /* 只处理 ASCII 码不为 0 的键 */ 
         if (cur_char) { 
             if (!ioq_full(&kbd_buf)) { 
-                put_char(cur_char); // 临时的 
+                // put_char(cur_char); // 临时的 
                 ioq_putchar(&kbd_buf, cur_char); 
             } 
             return;
