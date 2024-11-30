@@ -10,4 +10,5 @@ void init_all() {
     timer_init(); // 初始化 PIT 
     console_init(); //控制台初始化最好放在开中断之前 
     keyboard_init(); // 键盘初始化
+    tss_init(); //初始化tss段
 } 

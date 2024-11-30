@@ -35,10 +35,12 @@ static void kernel_thread(thread_func* function, void* func_arg) {
  将待执行的函数和参数放到 thread_stack 中相应的位置 */ 
 void thread_create(struct task_struct* pthread, thread_func function, void* func_arg) { 
     /* 先预留中断使用栈的空间，可见 thread.h 中定义的结构 */ 
-    pthread->self_kstack -= sizeof(struct intr_stack); 
+    //pthread->self_kstack -= sizeof(struct intr_stack); 
+    pthread->self_kstack = (uint32_t *)((int)(pthread->self_kstack) - sizeof(struct intr_stack));
 
     /* 再留出线程栈空间，可见 thread.h 中定义 */ 
-    pthread->self_kstack -= sizeof(struct thread_stack); 
+    //pthread->self_kstack -= sizeof(struct thread_stack); 
+    pthread->self_kstack = (uint32_t *)((int)(pthread->self_kstack) - sizeof(struct thread_stack));
     struct thread_stack* kthread_stack = (struct thread_stack*)pthread->self_kstack;    //将此时对应的栈的指针给到kthread_stack，这个地址用来初始化thread_stack
     kthread_stack->eip = kernel_thread; 
     kthread_stack->function = function; 

@@ -11,7 +11,7 @@ CC = gcc
 LD = ld
 
 #lib库的相对地址
-LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/ -I thread/
+LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/ -I thread/ -I userprog/
 
 #定义flags参数
 ASFLAGS = -f elf
@@ -24,7 +24,7 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/debug.o $(BUILD_DIR)/string.o $(BUILD_DIR)/bitmap.o \
 	$(BUILD_DIR)/memory.o $(BUILD_DIR)/thread.o $(BUILD_DIR)/list.o \
 	$(BUILD_DIR)/switch.o $(BUILD_DIR)/console.o $(BUILD_DIR)/sync.o \
-	$(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o
+	$(BUILD_DIR)/keyboard.o $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o
 
 
 # 编译mbr和loader并写入磁盘
@@ -78,6 +78,9 @@ $(BUILD_DIR)/thread.o : thread/thread.c
 	$(CC) $(CFLAGS) $< -o $@ 
 
 $(BUILD_DIR)/sync.o : thread/sync.c 
+	$(CC) $(CFLAGS) $< -o $@ 
+
+$(BUILD_DIR)/tss.o : userprog/tss.c 
 	$(CC) $(CFLAGS) $< -o $@ 
 
 ############## 汇编代码编译 ############### 

@@ -11,6 +11,7 @@
 #include "console.h"
 #include "sync.h"
 #include "keyboard.h"
+#include "tss.h"
 
 void init_all(void);
 
