@@ -32,7 +32,9 @@
 			"ioqueue.h": "c",
 			"keyboard.h": "c",
 			"stdint.h": "c",
-			"sync.h": "c"
+			"sync.h": "c",
+			"string.h": "c",
+			"process.h": "c"
 		}
 	}
 }

@@ -12,6 +12,7 @@
 #include "sync.h"
 #include "keyboard.h"
 #include "tss.h"
+#include "process.h"
 
 void init_all(void);
 
