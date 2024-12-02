@@ -13,6 +13,7 @@
 #include "keyboard.h"
 #include "tss.h"
 #include "process.h"
+#include "syscall-init.h"
 
 void init_all(void);
 
