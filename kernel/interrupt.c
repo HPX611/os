@@ -54,7 +54,7 @@ static void pic_init(void) {
     outb (PIC_S_DATA, 0x02); // ICW3: 设置从片连接到主片的  IR2 引脚 
     outb (PIC_S_DATA, 0x01); // ICW4: 8086 模式, 正常 EOI 
 
-    /*打开主片上 IR0,也就是目前只接受时钟产生的中断 */ 
+    //同时打开时钟中断与键盘中断
     outb (PIC_M_DATA, 0xfc); 
     outb (PIC_S_DATA, 0xff); 
 
@@ -79,8 +79,7 @@ static void idt_desc_init(void) {
     }
     //单独处理系统调用,系统调用对应的中断门dpl为3,中断处理程序为汇编的syscall_handler
     make_idt_desc(&idt[lastindex], IDT_DESC_ATTR_DPL3, syscall_handler);
-    put_str("   idt_desc_init done\n");
-    put_str(" idt_desc_init done\n"); 
+    put_str("idt_desc_init done\n");
 } 
 
 /* 通用的中断处理函数，一般用在异常出现时的处理 */ 
@@ -201,9 +200,10 @@ void idt_init(void) {
     exception_init(); // 异常名初始化并注册通常的中断处理函数 
     pic_init(); // 初始化 8259A 
     
-    /* 加载 idt */ 
-    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)((uint32_t)idt << 16))); 
-    asm volatile("lidt %0" : : "m" (idt_operand)); 
+
+    /* 加载idt */
+    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));    //定义要加载到IDTR寄存器中的值
+    asm volatile("lidt %0" : : "m" (idt_operand));
     put_str("idt_init done\n"); 
 } 
 

@@ -34,7 +34,14 @@
 			"stdint.h": "c",
 			"sync.h": "c",
 			"string.h": "c",
-			"process.h": "c"
+			"process.h": "c",
+			"*.tcc": "c",
+			"exception": "c",
+			"fstream": "c",
+			"iosfwd": "c",
+			"new": "c",
+			"streambuf": "c",
+			"memory_resource": "c"
 		}
 	}
 }
