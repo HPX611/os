@@ -14,7 +14,8 @@
 #include "tss.h"
 #include "process.h"
 #include "syscall-init.h"
-
+#include "console.h"
+#include "ide.h"
 void init_all(void);
 
 #endif
